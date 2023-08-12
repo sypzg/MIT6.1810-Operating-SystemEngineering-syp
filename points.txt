@@ -1,0 +1,3 @@
+1.design primes(2023,8,12)
+    There is a bug the the design of syscall wati, you should use 'while()' to ensure that child process really exit.
+
