@@ -320,6 +320,7 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  np->mask = p->mask;
   release(&np->lock);
 
   return pid;
@@ -681,3 +682,19 @@ procdump(void)
     printf("\n");
   }
 }
+
+//calculate the amount of processes
+uint64
+nproc(void)
+{
+    struct proc *p;
+    int cnt = 0;
+
+    for(p = proc; p < &proc[NPROC]; p++){
+        if(p->state != UNUSED)
+            ++cnt;
+    }
+
+    return cnt;
+}
+
