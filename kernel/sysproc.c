@@ -74,7 +74,36 @@ sys_sleep(void)
 int
 sys_pgaccess(void)
 {
-  // lab pgtbl: your code here.
+  uint64 va;
+  int num;
+  uint64 ad;
+  int len;
+  unsigned int buf = 0;
+  struct proc *p = myproc();
+
+  argaddr(0,&va);
+  argint(1,&num);
+  argaddr(2,&ad);
+
+  len = sizeof(buf);
+
+  if(va + num*PGSIZE > TRAMPOLINE){
+    return 0;
+  }
+
+  for(int i = 0; i < num; ++i){
+    pte_t* pte = walk(p->pagetable, va+i*PGSIZE, 0);
+    if(pte!=0 && (*pte & PTE_A)){
+      buf = buf | (1 << i);
+    }
+    if(pte!=0)
+    *pte = *pte & ~PTE_A;
+  }
+
+  if(copyout(p->pagetable, ad, (void*)&buf,len)<0){
+    return 0;
+  }
+
   return 0;
 }
 #endif
@@ -100,3 +129,4 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
